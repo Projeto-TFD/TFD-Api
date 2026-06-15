@@ -1,6 +1,6 @@
-import { ApiProperty, PartialType } from '@nestjs/swagger';
-import { TipoVeiculo } from '@prisma/client';
-import { IsEnum, IsInt, IsString, Length, Max, Min } from 'class-validator';
+import { ApiProperty, PartialType } from "@nestjs/swagger";
+import { TipoVeiculo } from "@prisma/client";
+import { IsEnum, IsInt, IsString, Length, Max, Min } from "class-validator";
 
 export class CreateVeiculoDto {
   @IsString() nome: string;

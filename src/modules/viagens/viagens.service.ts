@@ -1,9 +1,19 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaService } from '../../prisma/prisma.service';
-import { PaginationDto } from '../../common/pagination.dto';
-import { CreateViagemDto, UpdateViagemDto } from './dto';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from "@nestjs/common";
+import { PrismaService } from "../../prisma/prisma.service";
+import { PaginationDto } from "../../common/pagination.dto";
+import { CreateViagemDto, UpdateViagemDto } from "./dto";
 
-const includeCompleto = { veiculo: true, motorista: true, cidadeOrigem: true, cidadeDestino: true, pessoas: { include: { pessoa: true } } };
+const includeCompleto = {
+  veiculo: true,
+  motorista: true,
+  cidadeOrigem: true,
+  cidadeDestino: true,
+  pessoas: { include: { pessoa: true } },
+};
 
 @Injectable()
 export class ViagensService {
@@ -12,7 +22,10 @@ export class ViagensService {
   async create(dto: CreateViagemDto) {
     const saida = new Date(dto.dataSaida);
     const entrada = dto.dataEntrada ? new Date(dto.dataEntrada) : undefined;
-    if (entrada && entrada < saida) throw new BadRequestException('Data de entrada não pode ser anterior à saída.');
+    if (entrada && entrada < saida)
+      throw new BadRequestException(
+        "Data de entrada não pode ser anterior à saída.",
+      );
     return this.prisma.viagem.create({
       data: {
         veiculoId: dto.veiculoId,
@@ -22,19 +35,33 @@ export class ViagensService {
         dataSaida: saida,
         dataEntrada: entrada,
         observacao: dto.observacao,
-        pessoas: { create: dto.pessoas.map((p) => ({ pessoaId: p.pessoaId, tipoParticipacao: p.tipoParticipacao, observacao: p.observacao })) },
+        pessoas: {
+          create: dto.pessoas.map((p) => ({
+            pessoaId: p.pessoaId,
+            tipoParticipacao: p.tipoParticipacao,
+            observacao: p.observacao,
+          })),
+        },
       },
       include: includeCompleto,
     });
   }
 
   findAll({ page, limit }: PaginationDto) {
-    return this.prisma.viagem.findMany({ skip: (page - 1) * limit, take: limit, include: includeCompleto, orderBy: { dataSaida: 'desc' } });
+    return this.prisma.viagem.findMany({
+      skip: (page - 1) * limit,
+      take: limit,
+      include: includeCompleto,
+      orderBy: { dataSaida: "desc" },
+    });
   }
 
   async findOne(id: number) {
-    const item = await this.prisma.viagem.findUnique({ where: { id }, include: includeCompleto });
-    if (!item) throw new NotFoundException('Viagem não encontrada');
+    const item = await this.prisma.viagem.findUnique({
+      where: { id },
+      include: includeCompleto,
+    });
+    if (!item) throw new NotFoundException("Viagem não encontrada");
     return item;
   }
 
@@ -42,7 +69,10 @@ export class ViagensService {
     await this.findOne(id);
     const saida = dto.dataSaida ? new Date(dto.dataSaida) : undefined;
     const entrada = dto.dataEntrada ? new Date(dto.dataEntrada) : undefined;
-    if (saida && entrada && entrada < saida) throw new BadRequestException('Data de entrada não pode ser anterior à saída.');
+    if (saida && entrada && entrada < saida)
+      throw new BadRequestException(
+        "Data de entrada não pode ser anterior à saída.",
+      );
     return this.prisma.$transaction(async (tx) => {
       if (dto.pessoas) {
         await tx.viagemPessoa.deleteMany({ where: { viagemId: id } });
@@ -57,20 +87,39 @@ export class ViagensService {
           dataSaida: saida,
           dataEntrada: entrada,
           observacao: dto.observacao,
-          pessoas: dto.pessoas ? { create: dto.pessoas.map((p) => ({ pessoaId: p.pessoaId, tipoParticipacao: p.tipoParticipacao, observacao: p.observacao })) } : undefined,
+          pessoas: dto.pessoas
+            ? {
+                create: dto.pessoas.map((p) => ({
+                  pessoaId: p.pessoaId,
+                  tipoParticipacao: p.tipoParticipacao,
+                  observacao: p.observacao,
+                })),
+              }
+            : undefined,
         },
         include: includeCompleto,
       });
     });
   }
 
-  async remove(id: number) { await this.findOne(id); return this.prisma.viagem.delete({ where: { id } }); }
+  async remove(id: number) {
+    await this.findOne(id);
+    return this.prisma.viagem.delete({ where: { id } });
+  }
 
   porMotorista(motoristaId: number) {
-    return this.prisma.viagem.findMany({ where: { motoristaId }, include: includeCompleto, orderBy: { dataSaida: 'desc' } });
+    return this.prisma.viagem.findMany({
+      where: { motoristaId },
+      include: includeCompleto,
+      orderBy: { dataSaida: "desc" },
+    });
   }
 
   porVeiculo(veiculoId: number) {
-    return this.prisma.viagem.findMany({ where: { veiculoId }, include: includeCompleto, orderBy: { dataSaida: 'desc' } });
+    return this.prisma.viagem.findMany({
+      where: { veiculoId },
+      include: includeCompleto,
+      orderBy: { dataSaida: "desc" },
+    });
   }
 }
