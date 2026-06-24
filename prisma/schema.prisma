@@ -23,6 +23,24 @@ enum TipoParticipacao {
   ACOMPANHANTE
 }
 
+enum RoleUsuario {
+  ADMIN
+  OPERADOR
+}
+
+model Usuario {
+  id        Int         @id @default(autoincrement()) @map("id_usuario")
+  nome      String      @db.VarChar(160)
+  email     String      @unique @db.VarChar(160)
+  senhaHash String      @map("senha_hash") @db.VarChar(180)
+  role      RoleUsuario @default(OPERADOR)
+  ativo     Boolean     @default(true)
+  createdAt DateTime    @default(now()) @map("created_at")
+  updatedAt DateTime    @updatedAt @map("updated_at")
+
+  @@map("usuarios")
+}
+
 model Veiculo {
   id        Int         @id @default(autoincrement()) @map("id_veiculo")
   nome      String      @db.VarChar(120)

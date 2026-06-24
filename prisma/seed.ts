@@ -1,12 +1,34 @@
 import {
   PrismaClient,
+  RoleUsuario,
   TipoParticipacao,
   TipoVeiculo,
   TipoVinculoMotorista,
 } from "@prisma/client";
+import { randomBytes, scryptSync } from "crypto";
 const prisma = new PrismaClient();
 
+function hashPassword(password: string) {
+  const salt = randomBytes(16).toString("hex");
+  const hash = scryptSync(password, salt, 64).toString("hex");
+
+  return `scrypt:${salt}:${hash}`;
+}
+
 async function main() {
+  await prisma.usuario.upsert({
+    where: {
+      email: (process.env.ADMIN_EMAIL ?? "admin@local.com").toLowerCase(),
+    },
+    update: {},
+    create: {
+      nome: process.env.ADMIN_NAME ?? "Administrador",
+      email: (process.env.ADMIN_EMAIL ?? "admin@local.com").toLowerCase(),
+      senhaHash: hashPassword(process.env.ADMIN_PASSWORD ?? "admin123"),
+      role: RoleUsuario.ADMIN,
+    },
+  });
+
   const cajazeiras = await prisma.cidade.upsert({
     where: { nome_uf: { nome: "Cajazeiras", uf: "PB" } },
     update: {},
