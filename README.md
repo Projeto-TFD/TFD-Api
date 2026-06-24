@@ -13,7 +13,7 @@ API REST em NestJS + TypeScript + Prisma + PostgreSQL baseada no esquema lógico
 - Histórico de pessoa/paciente
 - Consulta de viagens por motorista e veículo
 - Alerta de habilitação vencendo
-- Seed com dados de exemplo
+- Seed opcional com dados de exemplo
 
 ## Rodando com Docker
 
@@ -49,6 +49,12 @@ Corpo:
   "email": "admin@local.com",
   "password": "admin123"
 }
+```
+
+Crie o admin inicial antes do primeiro login:
+
+```bash
+ADMIN_EMAIL=admin@local.com ADMIN_PASSWORD=troque-essa-senha npm run admin:create
 ```
 
 A resposta retorna `accessToken`. Todos os demais endpoints em `/api` exigem:
@@ -96,7 +102,8 @@ Suba apenas o banco:
 docker compose up postgres -d
 npm install
 npx prisma migrate dev --name init
-npm run prisma:seed
+npm run admin:create
+npm run prisma:seed # opcional, cria dados de exemplo
 npm run start:dev
 ```
 
