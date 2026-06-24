@@ -34,6 +34,52 @@ Swagger:
 http://localhost:3000/docs
 ```
 
+## Autenticacao e front web
+
+Faça login em:
+
+```text
+POST /api/auth/login
+```
+
+Corpo:
+
+```json
+{
+  "email": "admin@local.com",
+  "password": "admin123"
+}
+```
+
+A resposta retorna `accessToken`. Todos os demais endpoints em `/api` exigem:
+
+```http
+Authorization: Bearer accessToken
+```
+
+Configure no `.env`:
+
+```env
+JWT_SECRET="gere-um-segredo-forte-e-longo"
+JWT_EXPIRES_IN="8h"
+CORS_ORIGINS="http://localhost:5173,https://seu-front.com"
+ADMIN_EMAIL="admin@local.com"
+ADMIN_PASSWORD="troque-essa-senha"
+```
+
+Em producao (`NODE_ENV=production`), a API nao sobe sem `JWT_SECRET` e `CORS_ORIGINS`.
+O Swagger em `/docs` fica desabilitado em producao, exceto se `ENABLE_SWAGGER=true`.
+
+Endpoints de usuarios, apenas para `ADMIN`:
+
+```text
+POST  /api/usuarios
+GET   /api/usuarios
+GET   /api/usuarios/:id
+PATCH /api/usuarios/:id
+PATCH /api/usuarios/:id/senha
+```
+
 PgAdmin:
 
 ```text
