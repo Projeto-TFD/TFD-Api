@@ -76,7 +76,44 @@ ADMIN_PASSWORD="troque-essa-senha"
 Em producao (`NODE_ENV=production`), a API nao sobe sem `JWT_SECRET` e `CORS_ORIGINS`.
 O Swagger em `/docs` fica desabilitado em producao, exceto se `ENABLE_SWAGGER=true`.
 
-Endpoints de usuarios, apenas para `ADMIN`:
+## Controle de acesso por role
+
+A API possui duas roles:
+
+- `ADMIN`: acesso a todos os endpoints, incluindo o gerenciamento de usuarios.
+- `OPERADOR`: acesso aos recursos operacionais, mas sem acesso ao gerenciamento de usuarios.
+
+### Endpoints publicos
+
+Nao exigem token:
+
+| Metodo | Endpoint | Acesso | Descricao |
+| --- | --- | --- | --- |
+| `POST` | `/api/auth/login` | Publico | Login geral para `ADMIN` e `OPERADOR` |
+| `POST` | `/api/auth/admin/login` | Publico, somente credenciais de `ADMIN` | Login exclusivo do site administrativo |
+
+O endpoint `/api/auth/admin/login` retorna `401 Unauthorized` quando as
+credenciais pertencem a um usuario que nao possui a role `ADMIN`.
+
+### Endpoints autenticados
+
+Exigem o cabecalho `Authorization: Bearer accessToken`:
+
+| Endpoints | `ADMIN` | `OPERADOR` |
+| --- | :---: | :---: |
+| `GET /api/auth/me` | Sim | Sim |
+| `/api/pessoas` | Sim | Sim |
+| `/api/veiculos` | Sim | Sim |
+| `/api/motoristas` | Sim | Sim |
+| `/api/cidades` | Sim | Sim |
+| `/api/viagens` | Sim | Sim |
+| `/api/usuarios` | Sim | Nao |
+
+Todos os metodos disponiveis sob cada recurso seguem a mesma permissao indicada
+na tabela. Por exemplo, `POST`, `GET`, `PATCH` e `DELETE` de `/api/viagens`
+podem ser usados por `ADMIN` e `OPERADOR`.
+
+Endpoints de usuarios, exclusivos para `ADMIN`:
 
 ```text
 POST  /api/usuarios
@@ -85,6 +122,12 @@ GET   /api/usuarios/:id
 PATCH /api/usuarios/:id
 PATCH /api/usuarios/:id/senha
 ```
+
+Respostas relacionadas a autenticacao e autorizacao:
+
+- `401 Unauthorized`: token ausente, invalido ou expirado; credenciais invalidas;
+  ou tentativa de usar o login administrativo com uma role diferente de `ADMIN`.
+- `403 Forbidden`: usuario autenticado, mas sem permissao para acessar o recurso.
 
 PgAdmin:
 
