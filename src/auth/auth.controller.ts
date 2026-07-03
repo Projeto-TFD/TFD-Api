@@ -17,6 +17,12 @@ export class AuthController {
     return this.authService.login(dto);
   }
 
+  @Public()
+  @Post("admin/login")
+  adminLogin(@Body() dto: LoginDto) {
+    return this.authService.adminLogin(dto);
+  }
+
   @ApiBearerAuth()
   @Get("me")
   me(@CurrentUser() user: AuthenticatedUser) {

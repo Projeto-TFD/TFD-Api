@@ -13,6 +13,22 @@ export class AuthService {
   ) {}
 
   async login(dto: LoginDto) {
+    const usuario = await this.validateCredentials(dto);
+
+    return this.createLoginResponse(usuario);
+  }
+
+  async adminLogin(dto: LoginDto) {
+    const usuario = await this.validateCredentials(dto);
+
+    if (usuario.role !== "ADMIN") {
+      throw new UnauthorizedException("Credenciais invalidas");
+    }
+
+    return this.createLoginResponse(usuario);
+  }
+
+  private async validateCredentials(dto: LoginDto) {
     const usuario = await this.prisma.usuario.findUnique({
       where: { email: dto.email.toLowerCase() },
     });
@@ -30,6 +46,12 @@ export class AuthService {
       throw new UnauthorizedException("Credenciais invalidas");
     }
 
+    return usuario;
+  }
+
+  private createLoginResponse(
+    usuario: Awaited<ReturnType<AuthService["validateCredentials"]>>,
+  ) {
     const token = this.jwtService.sign({
       sub: usuario.id,
       nome: usuario.nome,
