@@ -15,6 +15,10 @@ export class AuthService {
   async login(dto: LoginDto) {
     const usuario = await this.validateCredentials(dto);
 
+    if (usuario.role !== "OPERADOR") {
+      throw new UnauthorizedException("Credenciais invalidas");
+    }
+
     return this.createLoginResponse(usuario);
   }
 

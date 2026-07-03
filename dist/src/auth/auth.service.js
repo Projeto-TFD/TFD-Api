@@ -22,6 +22,9 @@ let AuthService = class AuthService {
     }
     async login(dto) {
         const usuario = await this.validateCredentials(dto);
+        if (usuario.role !== "OPERADOR") {
+            throw new common_1.UnauthorizedException("Credenciais invalidas");
+        }
         return this.createLoginResponse(usuario);
     }
     async adminLogin(dto) {

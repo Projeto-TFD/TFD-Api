@@ -89,11 +89,13 @@ Nao exigem token:
 
 | Metodo | Endpoint | Acesso | Descricao |
 | --- | --- | --- | --- |
-| `POST` | `/api/auth/login` | Publico | Login geral para `ADMIN` e `OPERADOR` |
+| `POST` | `/api/auth/login` | Publico, somente credenciais de `OPERADOR` | Login do aplicativo operacional |
 | `POST` | `/api/auth/admin/login` | Publico, somente credenciais de `ADMIN` | Login exclusivo do site administrativo |
 
 O endpoint `/api/auth/admin/login` retorna `401 Unauthorized` quando as
 credenciais pertencem a um usuario que nao possui a role `ADMIN`.
+Da mesma forma, `/api/auth/login` retorna `401 Unauthorized` quando as
+credenciais pertencem a um usuario que nao possui a role `OPERADOR`.
 
 ### Endpoints autenticados
 
@@ -126,7 +128,7 @@ PATCH /api/usuarios/:id/senha
 Respostas relacionadas a autenticacao e autorizacao:
 
 - `401 Unauthorized`: token ausente, invalido ou expirado; credenciais invalidas;
-  ou tentativa de usar o login administrativo com uma role diferente de `ADMIN`.
+  ou tentativa de usar um endpoint de login com uma role nao permitida.
 - `403 Forbidden`: usuario autenticado, mas sem permissao para acessar o recurso.
 
 PgAdmin:
