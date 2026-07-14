@@ -1,12 +1,24 @@
-FROM node:22-alpine AS deps
+FROM node:22-alpine AS dependencies
 WORKDIR /app
 COPY package*.json ./
-RUN npm install
+RUN npm ci
 
-FROM node:22-alpine AS dev
+FROM dependencies AS build
+COPY prisma ./prisma
+COPY src ./src
+COPY nest-cli.json tsconfig.json ./
+RUN npx prisma generate && npm run build
+
+FROM node:22-alpine AS production
 WORKDIR /app
-COPY --from=deps /app/node_modules ./node_modules
-COPY . .
+ENV NODE_ENV=production
+
+COPY package*.json ./
+RUN npm ci --omit=dev && npm cache clean --force
+COPY prisma ./prisma
 RUN npx prisma generate
+COPY --from=build /app/dist ./dist
+
+USER node
 EXPOSE 3000
-CMD ["sh", "-c", "npx prisma migrate deploy && npm run start:dev"]
+CMD ["sh", "-c", "npx prisma migrate deploy && node dist/prisma/create-admin.js && node dist/main"]

@@ -34,6 +34,12 @@ Swagger:
 http://localhost:3000/docs
 ```
 
+Health check publico:
+
+```text
+http://localhost:3000/api/health
+```
+
 ## Autenticacao e front web
 
 Faça login em:
@@ -75,6 +81,42 @@ ADMIN_PASSWORD="troque-essa-senha"
 
 Em producao (`NODE_ENV=production`), a API nao sobe sem `JWT_SECRET` e `CORS_ORIGINS`.
 O Swagger em `/docs` fica desabilitado em producao, exceto se `ENABLE_SWAGGER=true`.
+
+## Deploy gratuito (Koyeb + Neon)
+
+O banco PostgreSQL deve ser criado no Neon e a API publicada no Koyeb a partir
+do repositorio GitHub. Nunca envie o arquivo `.env` ao GitHub: cadastre os
+valores sensiveis como **Secrets** nas variaveis de ambiente do Koyeb.
+
+Variaveis obrigatorias em producao:
+
+```env
+NODE_ENV=production
+PORT=3000
+DATABASE_URL=postgresql://... # Secret: URL fornecida pelo Neon, com SSL
+JWT_SECRET=...                # Secret: ao menos 32 caracteres aleatorios
+JWT_EXPIRES_IN=8h
+CORS_ORIGINS=https://seu-frontend.exemplo
+ENABLE_SWAGGER=false
+ADMIN_NAME=Administrador
+ADMIN_EMAIL=admin@exemplo.com
+ADMIN_PASSWORD=...            # Secret: senha forte e exclusiva
+```
+
+No Koyeb, publique como Web Service usando o `Dockerfile`, exponha a porta
+`3000` via HTTP no caminho `/` e configure um health check HTTP em
+`/api/health`. O container aplica somente migrations ja versionadas com
+`prisma migrate deploy` antes de iniciar a API. Em seguida, cria o primeiro
+administrador a partir de `ADMIN_NAME`, `ADMIN_EMAIL` e `ADMIN_PASSWORD`.
+Se o email ja existir, ele nao altera a senha nem as permissoes do usuario.
+
+Para criar uma migration futura, gere e versione-a localmente antes do deploy:
+
+```bash
+npx prisma migrate dev --name descricao_da_alteracao
+git add prisma/migrations prisma/schema.prisma
+git commit -m "chore: adiciona migrations"
+```
 
 ## Controle de acesso por role
 

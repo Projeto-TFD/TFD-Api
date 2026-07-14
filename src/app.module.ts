@@ -10,6 +10,7 @@ import { MotoristasModule } from "./modules/motoristas/motoristas.module";
 import { CidadesModule } from "./modules/cidades/cidades.module";
 import { ViagensModule } from "./modules/viagens/viagens.module";
 import { UsuariosModule } from "./modules/usuarios/usuarios.module";
+import { HealthController } from "./health/health.controller";
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { UsuariosModule } from "./modules/usuarios/usuarios.module";
     ViagensModule,
     UsuariosModule,
   ],
+  controllers: [HealthController],
   providers: [
     {
       provide: APP_GUARD,
