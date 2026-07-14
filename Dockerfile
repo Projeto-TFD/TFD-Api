@@ -21,4 +21,4 @@ COPY --from=build /app/dist ./dist
 
 USER node
 EXPOSE 3000
-CMD ["sh", "-c", "npx prisma migrate deploy && node dist/prisma/create-admin.js && node dist/main"]
+CMD ["sh", "-c", "npx prisma migrate deploy && node dist/prisma/create-admin.js && node dist/src/main.js"]
