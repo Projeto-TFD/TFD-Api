@@ -151,6 +151,7 @@ Exigem o cabecalho `Authorization: Bearer accessToken`:
 | `/api/motoristas` | Sim | Sim |
 | `/api/cidades` | Sim | Sim |
 | `/api/viagens` | Sim | Sim |
+| `/api/dashboard` | Sim | Sim |
 | `/api/usuarios` | Sim | Nao |
 
 Todos os metodos disponiveis sob cada recurso seguem a mesma permissao indicada
@@ -249,6 +250,26 @@ GET    /api/viagens/veiculo/:veiculoId
 PATCH  /api/viagens/:id
 DELETE /api/viagens/:id
 ```
+
+### Dashboard
+
+```text
+GET /api/dashboard
+GET /api/dashboard/metricas
+```
+
+`GET /api/dashboard` retorna os totais de viagens e passageiros, a quantidade
+de motoristas em viagem (viagens sem `dataEntrada`) e a quantidade de viagens
+por cidade de destino. `GET /api/dashboard/metricas` retorna somente os três
+totais numéricos. As duas rotas aceitam `dataInicio` e `dataFim` (datas ISO,
+inclusivas) para filtrar as viagens por `dataSaida`, por exemplo:
+
+```text
+GET /api/dashboard?dataInicio=2026-05-01&dataFim=2026-05-31
+```
+
+Quando há filtro de período, `totalMotoristasAtivos` é a quantidade de
+motoristas distintos que realizaram viagem no intervalo.
 
 ## Exemplo de criação de viagem
 

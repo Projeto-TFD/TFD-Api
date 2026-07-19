@@ -10,6 +10,7 @@ import { MotoristasModule } from "./modules/motoristas/motoristas.module";
 import { CidadesModule } from "./modules/cidades/cidades.module";
 import { ViagensModule } from "./modules/viagens/viagens.module";
 import { UsuariosModule } from "./modules/usuarios/usuarios.module";
+import { DashboardModule } from "./modules/dashboard/dashboard.module";
 import { HealthController } from "./health/health.controller";
 
 @Module({
@@ -23,6 +24,7 @@ import { HealthController } from "./health/health.controller";
     CidadesModule,
     ViagensModule,
     UsuariosModule,
+    DashboardModule,
   ],
   controllers: [HealthController],
   providers: [
