@@ -21,21 +21,36 @@ export class DashboardService {
     const whereMotoristas = this.temPeriodo(periodo)
       ? whereViagens
       : { dataEntrada: null };
-    const [totalViagens, totalPassageiros, motoristasEmViagem] =
-      await Promise.all([
-        this.prisma.viagem.count({ where: whereViagens }),
-        this.prisma.viagemPessoa.count({ where: { viagem: whereViagens } }),
-        this.prisma.viagem.findMany({
-          where: whereMotoristas,
-          distinct: ["motoristaId"],
-          select: { motoristaId: true },
-        }),
-      ]);
+    const totalVeiculos = this.temPeriodo(periodo)
+      ? this.prisma.viagem
+          .findMany({
+            where: whereViagens,
+            distinct: ["veiculoId"],
+            select: { veiculoId: true },
+          })
+          .then((veiculos) => veiculos.length)
+      : this.prisma.veiculo.count();
+    const [
+      totalViagens,
+      totalPassageiros,
+      motoristasEmViagem,
+      quantidadeVeiculos,
+    ] = await Promise.all([
+      this.prisma.viagem.count({ where: whereViagens }),
+      this.prisma.viagemPessoa.count({ where: { viagem: whereViagens } }),
+      this.prisma.viagem.findMany({
+        where: whereMotoristas,
+        distinct: ["motoristaId"],
+        select: { motoristaId: true },
+      }),
+      totalVeiculos,
+    ]);
 
     return {
       totalViagens,
       totalPassageiros,
       totalMotoristasAtivos: motoristasEmViagem.length,
+      totalVeiculos: quantidadeVeiculos,
     };
   }
 

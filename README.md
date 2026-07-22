@@ -258,9 +258,9 @@ GET /api/dashboard
 GET /api/dashboard/metricas
 ```
 
-`GET /api/dashboard` retorna os totais de viagens e passageiros, a quantidade
-de motoristas em viagem (viagens sem `dataEntrada`) e a quantidade de viagens
-por cidade de destino. `GET /api/dashboard/metricas` retorna somente os três
+`GET /api/dashboard` retorna os totais de viagens, passageiros e veículos, a
+quantidade de motoristas em viagem (viagens sem `dataEntrada`) e a quantidade
+de viagens por cidade de destino. `GET /api/dashboard/metricas` retorna somente os quatro
 totais numéricos. As duas rotas aceitam `dataInicio` e `dataFim` (datas ISO,
 inclusivas) para filtrar as viagens por `dataSaida`, por exemplo:
 
@@ -269,7 +269,8 @@ GET /api/dashboard?dataInicio=2026-05-01&dataFim=2026-05-31
 ```
 
 Quando há filtro de período, `totalMotoristasAtivos` é a quantidade de
-motoristas distintos que realizaram viagem no intervalo.
+motoristas distintos que realizaram viagem no intervalo, e `totalVeiculos` é
+a quantidade de veículos distintos utilizados nesse intervalo.
 
 ## Exemplo de criação de viagem
 
